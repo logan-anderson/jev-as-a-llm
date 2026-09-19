@@ -21,6 +21,19 @@ export const CORPUS = {
      itself someone somebody anyone anybody everyone everybody nobody something
      anything everything nothing whatever`,
   ),
+  names: define(
+    "names of people and AI models (Jev, Claude, Emma, Liam, ChatGPT...)",
+    `Jev TypeSafe Claude Anthropic Opus Sonnet Haiku Fable ChatGPT GPT OpenAI Gemini
+     Google Llama Meta Mistral Grok DeepSeek Qwen Copilot Siri Alexa
+     Liam Noah Oliver James Elijah William Henry Lucas Benjamin Theodore Jack Levi
+     Alexander Mason Michael Ethan Daniel Jacob Logan Jackson Sebastian Aiden Matthew
+     Samuel David Joseph Carter Owen Wyatt John Luke Gabriel Anthony Isaac Dylan
+     Nathan Ryan Adam Tom Max Sam Ben Alex Chris
+     Olivia Emma Charlotte Amelia Sophia Mia Isabella Ava Evelyn Luna Harper Sofia
+     Camila Eleanor Elizabeth Violet Scarlett Emily Hazel Lily Chloe Nora Ella Zoe
+     Grace Aria Layla Riley Penelope Stella Aurora Hannah Sarah Madison Abigail Ellie
+     Anna Lucy Maya Sophie Kate Jessica Rachel Julia`,
+  ),
   greetings_reactions: define(
     "greetings, thanks, apologies and short reactions (hello, thanks, wow...)",
     `hello hi hey thanks thank please sorry yes no okay ok sure welcome bye goodbye

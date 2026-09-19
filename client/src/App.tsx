@@ -8,7 +8,7 @@ type Vocab = 'letters' | 'small' | 'large'
 const VOCABS: { id: Vocab; label: string; hint: string }[] = [
   { id: 'letters', label: 'Letters', hint: 'a-z and space, 1 Jev call per character' },
   { id: 'small', label: 'Small', hint: '~170 words, 1 Jev call per word' },
-  { id: 'large', label: 'Large', hint: '~1,600 words in categories, 2 Jev calls per word' },
+  { id: 'large', label: 'Large', hint: '~1,700 words in categories, 2 Jev calls per word' },
 ]
 
 // Which vocabulary produced each assistant message, keyed by message index.

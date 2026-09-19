@@ -41,7 +41,7 @@ export const app = new Hono()
   .route("/chat/letters", chatRoute(nextAgentMessageLetters))
   // Small vocabulary (~170 words), one Jev call per word.
   .route("/chat", chatRoute(nextAgentMessage))
-  // Large vocabulary (~1,600 words in categories), two Jev calls per word.
+  // Large vocabulary (~1,700 words in categories), two Jev calls per word.
   .route("/chat/large", chatRoute(nextAgentMessageLarge));
 
 export type AppType = typeof app;
