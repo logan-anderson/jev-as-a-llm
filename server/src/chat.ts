@@ -67,7 +67,7 @@ const getClient = () => (client ??= new TypeSafeClient());
 // A type alias (not an interface) so it's assignable to the SDK's JSON state type.
 type ReplyState = {
   conversation: { role: Role; content: string }[];
-  assistant_reply_so_far: string;
+  reply: string;
 };
 
 // Picks the next step of the reply and returns the whole new reply, or undefined to stop.
@@ -76,27 +76,38 @@ type PickNext = (state: ReplyState) => Promise<string | undefined>;
 // Letters: one Jev call per character, choosing from a-z, space or stop.
 const LETTERS = "abcdefghijklmnopqrstuvwxyz".split("");
 
+// Bare letter labels (not whole candidate replies): with full replies as options,
+// Jev prefers any complete word ("a") over a half-typed one and stops immediately.
 const pickLetter: PickNext = async (state) => {
-  const reply = state.assistant_reply_so_far;
-  const letters = Object.fromEntries(LETTERS.map((l) => [l, JSON.stringify(reply + l)]));
+  const reply = state.reply;
+  // Space and stop only make sense after some text, and never twice in a row,
+  // otherwise Jev gets stuck choosing space forever.
+  const canBreak = reply !== "" && !reply.endsWith(" ");
+  console.log('jev state', JSON.stringify(state, null, 2));
   const { answers } = await getClient().systemOne({
     state,
     questions: {
-      next: choice(WORD_QUESTION, {
-        ...letters,
-        space: JSON.stringify(`${reply} `),
-        stop: stopOption(reply),
-      }),
+      pickLetter: choice(
+        "Next letter in response to this conversation, your choice will be appended",
+        {
+          ...Object.fromEntries(LETTERS.map((l) => [l, null])),
+          ...(canBreak && {
+            space: "A space character between words",
+            stop: "The reply is complete; send it to the user",
+          }),
+        },
+      ),
     },
   });
-  const next = answers.next.choice;
+  console.log('jev results', JSON.stringify(answers, null, 2));
+  const next = answers.pickLetter.choice;
   if (next === "stop") return undefined;
   return reply + (next === "space" ? " " : next);
 };
 
 // Small vocabulary: one Jev call per word, choosing from every word at once.
 const pickFromWords: PickNext = async (state) => {
-  const reply = state.assistant_reply_so_far;
+  const reply = state.reply;
   const { answers } = await getClient().systemOne({
     state,
     questions: {
@@ -109,7 +120,7 @@ const pickFromWords: PickNext = async (state) => {
 // Large vocabulary: two Jev calls per word so neither sees the whole corpus.
 // First Jev picks a category (or stop), then a word from that category.
 const pickFromCorpus: PickNext = async (state) => {
-  const reply = state.assistant_reply_so_far;
+  const reply = state.reply;
   const categories = Object.fromEntries(
     Object.entries(CORPUS).map(([name, { description }]) => [name, description]),
   );
@@ -139,7 +150,7 @@ async function buildReply(messages: ChatMessage[], pickNext: PickNext): Promise<
   let reply = "";
 
   while (reply.length < MAX_REPLY_LENGTH) {
-    const next = await pickNext({ conversation, assistant_reply_so_far: reply });
+    const next = await pickNext({ conversation, reply });
     if (next === undefined) break;
     reply = next;
     console.log('reply so far:', reply);
